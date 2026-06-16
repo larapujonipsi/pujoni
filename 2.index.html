@@ -1444,7 +1444,7 @@ function addTasks(){
 
 /* ========== RENDER ========== */
 function renderAll(){ALL_BLK.forEach(renderBlk);syncCounts();syncLimBars();syncHbUI();}
-function byBlk(b){return S.tasks.filter(t=>t.blk===b).sort((a,b)=>a.order-b.order);}
+function byBlk(b){return S.tasks.filter(t=>t.blk===b && !t.done).sort((a,b)=>a.order-b.order);}
 
 function renderBlk(bid){
   const bd=qs('#bd-'+bid);if(!bd) return;
