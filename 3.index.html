@@ -138,10 +138,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .blk-body {
   flex:0 0 auto; min-height:0; max-height:280px; overflow-y:auto; overflow-x:hidden; padding:7px;
   display:flex; flex-direction:column; gap:5px;
-  background:color-mix(in srgb, var(--C) 5%, #f2f2f2);
+  background:var(--C);
   transition:outline .1s;
   scrollbar-width:thick;
-  scrollbar-color:var(--C) rgba(255,255,255,.3);
+  scrollbar-color:rgba(255,255,255,.6) rgba(255,255,255,.2);
 }
 .blk-body::-webkit-scrollbar { width:16px; }
 .blk-body::-webkit-scrollbar-track { background:rgba(255,255,255,.3); border-radius:10px; }
@@ -1437,9 +1437,6 @@ function addTasks(){
     lastTaskIdx = S.tasks.length - 1;
   });
   inp.value='';saveLS();renderAll();checkDates();
-  if(lastTaskIdx !== null) {
-    setTimeout(() => showAreaModal(lastTaskIdx), 100);
-  }
 }
 
 /* ========== RENDER ========== */
@@ -1467,11 +1464,14 @@ function makeTk(t){
   const areaBadge = t._tabRef
     ? `<span class="tk-area-badge" style="background:${t._tabRef.color}">${esc(t._tabRef.areaName)}</span>`
     : '';
+  const areaBtn = t.blk === 'pend' && !t.area
+    ? `<span class="tag tag-mv" onclick="openAreaModalForTask(event,'${S.tasks.indexOf(t)}')">🏷️ área</span>`
+    : '';
   el.innerHTML=`
     <div class="tk-cb${t.done?' on':''}" onclick="toggleDone('${t.id}')"></div>
     <div class="tk-body">
       <div class="tk-txt${t.done?' done':''}">${esc(t.txt)}</div>
-      <div class="tk-meta">${dtag}${ttag}${areaBadge}<span class="tag tag-mv" onclick="openMp(event,'${t.id}')">↗ mover</span></div>
+      <div class="tk-meta">${dtag}${ttag}${areaBadge}${areaBtn}<span class="tag tag-mv" onclick="openMp(event,'${t.id}')">↗ mover</span></div>
     </div>
     <span class="tk-del" onclick="delTk('${t.id}')">×</span>`;
   el.addEventListener('dragstart',e=>{dragId=t.id;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
@@ -2452,6 +2452,11 @@ function closeAreaModal() {
   qs('#area-modal').style.display='none';
   qs('#area-modal-bg').style.display='none';
   pendingTaskIdx = null;
+}
+
+function openAreaModalForTask(e, taskIdx) {
+  e.stopPropagation();
+  showAreaModal(taskIdx);
 }
 
 function toggleMenu() {
